@@ -37,5 +37,10 @@ urlpatterns= [
     path('contact/', views.contact, name= "contact"),
     path('add-contact/', views.AddContact.as_view(), name= "add-contact"),
     path('edit-contact/<int:pk>', views.EditContact.as_view(), name="edit-contact"),
-    path('email/', views.email_notifications, name= "email")
+    path('email/', views.email_notifications, name= "email"),
+    path('orders/', views.orders, name="orders"),
+    path('order-search/', views.order_search, name= "order-search"),
+    path('order-info/<int:pk>', views.order_info, name="order-info"),
+    path('cust-order/<str:name>', views.cust_order, name= "cust-order"),
+    path('del-payment/<int:pk>', views.DelPayments.as_view(), name= "del-payment"),
 ]

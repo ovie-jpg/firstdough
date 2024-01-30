@@ -53,7 +53,7 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav  ">
               <li class="nav-item ">
-                <a class="nav-link" href="{% url 'profile' %}">Back </a>
+                <a class="nav-link" href="{% url 'orders' %}">Back </a>
               </li>
               <form class="form-inline">
                 <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit">
@@ -70,7 +70,15 @@
     <br>
     <!-- end header section -->
   </div>
-{% if payments %}
+<h1>you searched for: {{search}}</h1>
+{% if user.is_staff %}
+<form class="form-inline my-2 my-lg-0" action="{% url 'order-search' %}">
+  <input class="form-control mr-sm-2" type="text" placeholder="Search" name="search">
+  <button type="submit"><span class="search-icon"><svg class="svgIcon-use" width="25" height="25" viewbox="0 0 25 25"><path d="M20.067 18.933l-4.157-4.157a6 6 0 1 0-.884.884l4.157 4.157a.624.624 0 1 0 .884-.884zM6.5 11c0-2.62 2.13-4.75 4.75-4.75S16 8.38 16 11s-2.13 4.75-4.75 4.75S6.5 13.62 6.5 11z"></path></svg></span></button>
+</form>
+<br>
+<br>
+{% if payments is not None %}
           {% for payment in payments %}
           <div class="col-md-4">
             <div class="product-item">
@@ -84,9 +92,8 @@
                 <h1 style="color: green;">PAID</h1>
                 {% elif payment.transaction == 'unsuccessful' %}
                 <h1 style="color: red;">Try again</h1>
-                {% else %}
-                <a href="{% url 'init-payment' payment.pk %}"><button class="btn btn-primary">proceed to pay</button></a>
                 {% endif %}
+                <a href="{% url 'del-payment' payment.pk %}"><button class="btn btn-danger">Delete</button></a>
               </div>
             </div>
           </div>
@@ -95,9 +102,11 @@
           <br>
           {% endfor %}
 {% else %}
-<center><h1 style="color: red;">NO PAYMENTS MADE</h1></center>
+<h1>No such name</h1>
 {% endif %}
-    
+{% else %}
+<h1 style="color: red;">UNauthorized</h1>
+{% endif %}    
     
           <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
           

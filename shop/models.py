@@ -27,7 +27,7 @@ class Product(models.Model):
 class Offer(models.Model):
     product= models.ManyToManyField(Product, blank= True)
     discount_percentage= models.IntegerField()
-    valid_till= models.DateField()
+    valid_till= models.DateTimeField()
 
     def get_absolute_url(self):
         return reverse('home')

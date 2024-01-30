@@ -53,7 +53,7 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav  ">
               <li class="nav-item ">
-                <a class="nav-link" href="{% url 'profile' %}">Back </a>
+                <a class="nav-link" href="{% url 'orders' %}">Back </a>
               </li>
               <form class="form-inline">
                 <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit">
@@ -75,7 +75,7 @@
           <div class="col-md-4">
             <div class="product-item">
               <div class="down-content">
-                <a href="#"><h4>{{payment.product}}</h4></a>
+                <a href="{% url 'order-info' payment.pk %}"><h4>{{payment.product}}</h4></a>
                 <h6>${{payment.amount}}</h6>
                 <p>{{payment.transaction}}</p>
                 <small>Ref number: <span>{{payment.ref}}</span></small>
@@ -84,9 +84,8 @@
                 <h1 style="color: green;">PAID</h1>
                 {% elif payment.transaction == 'unsuccessful' %}
                 <h1 style="color: red;">Try again</h1>
-                {% else %}
-                <a href="{% url 'init-payment' payment.pk %}"><button class="btn btn-primary">proceed to pay</button></a>
                 {% endif %}
+                <a href="{% url 'init-payment' payment.pk %}"><button class="btn btn-danger">delete</button></a>
               </div>
             </div>
           </div>

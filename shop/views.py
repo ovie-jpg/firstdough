@@ -1,4 +1,5 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render 
+from django.contrib.auth.models import User
 from .models import Product, Category, Profile, Offer, Payment, Bank, Banks, Transfer, PaystackKeys, Profit, About
 import uuid
 from datetime import date
@@ -10,6 +11,8 @@ import requests
 from django.contrib import messages
 from decimal import Decimal
 from django.core.mail import send_mail
+from celery import shared_task
+from django.utils import timezone
 
 # Create your views here.
 def home(request, **kwargs):
@@ -30,6 +33,10 @@ def home(request, **kwargs):
     }
     return render(request, 'home.html', context)
 
+@shared_task
+def delete_expired_offer(offer):
+    offer.delete()
+
 def info(request, pk, **kwargs):
     ref_by= str(kwargs.get("ref_by"))
     if Profile.objects.filter(code=ref_by).exists():
@@ -40,7 +47,7 @@ def info(request, pk, **kwargs):
     ref= str(uuid.uuid4()).replace("-", "")[:7]
     offers= Offer.objects.all()
     offer= ''
-    today= date.today()
+    today= timezone.now()
 
     if Offer.objects.filter(product=product).exists():
         offer= Offer.objects.get(product=product)
@@ -50,8 +57,9 @@ def info(request, pk, **kwargs):
         product.discount= None
         product.save()
 
-    if offer != '' and offer.valid_till == today:
-        offer.delete()
+    if offer != '' and offer.valid_till <= today:
+        delete_expired_offer.apply_async(args=[offer], eta=offer.valid_till)
+        offer= ''
 
     if request.method == 'POST':
         quantity= int(request.POST['quantity'])
@@ -73,7 +81,8 @@ def info(request, pk, **kwargs):
         'product': product,
         'offers': offers,
         'offer': offer,
-        'profile': profile
+        'profile': profile,
+        'today': today
     }
     return render(request, "info.html", context)
 
@@ -405,3 +414,44 @@ def email_notifications(request):
             send_mail(subject, message, from_email, [recipient_list])
             messages.info(request, 'email sent')
     return render(request, 'email.html')
+
+def orders(request):
+    payment=Payment.objects.all()
+    context= {
+        'payments': payment
+    }
+    return render(request, 'orders.html', context)
+
+def order_search(request):
+    search= request.GET['search']
+    users = User.objects.filter(username__icontains=search)
+    
+    payments = Payment.objects.filter(user__in=users)
+
+    context= {
+        'search': search,
+        'payments': payments
+    }
+    return render(request, 'order-search.html', context)
+
+def order_info(request, pk):
+    payment= Payment.objects.get(pk=pk)
+    context= {
+        'payment': payment
+    }
+    return render(request, 'order-info.html', context)
+
+def cust_order(request, **kwargs):
+    name= str(kwargs.get('name'))
+    user = User.objects.filter(username=name).first()
+    payment= Payment.objects.filter(user=user)
+
+    context= {
+        'payments': payment
+    }
+    return render(request, 'cust-order.html', context)
+
+class DelPayments(DeleteView):
+    model= Payment
+    template_name= 'del-payment.html'
+    success_url= reverse_lazy('orders')

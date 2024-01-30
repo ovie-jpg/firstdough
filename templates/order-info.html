@@ -1,3 +1,4 @@
+{% if user.is_staff %}
 {% load static %}
 <!DOCTYPE html>
 <html>
@@ -53,7 +54,7 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav  ">
               <li class="nav-item ">
-                <a class="nav-link" href="{% url 'profile' %}">Back </a>
+                <a class="nav-link" href="{% url 'orders' %}">Back </a>
               </li>
               <form class="form-inline">
                 <button class="btn  my-2 my-sm-0 nav_search-btn" type="submit">
@@ -70,8 +71,7 @@
     <br>
     <!-- end header section -->
   </div>
-{% if payments %}
-          {% for payment in payments %}
+{% if payment %}
           <div class="col-md-4">
             <div class="product-item">
               <div class="down-content">
@@ -84,16 +84,14 @@
                 <h1 style="color: green;">PAID</h1>
                 {% elif payment.transaction == 'unsuccessful' %}
                 <h1 style="color: red;">Try again</h1>
-                {% else %}
-                <a href="{% url 'init-payment' payment.pk %}"><button class="btn btn-primary">proceed to pay</button></a>
                 {% endif %}
+                <a href="{% url 'init-payment' payment.pk %}"><button class="btn btn-danger">Delete</button></a>
               </div>
             </div>
           </div>
           <br>
           <br>
           <br>
-          {% endfor %}
 {% else %}
 <center><h1 style="color: red;">NO PAYMENTS MADE</h1></center>
 {% endif %}
@@ -122,3 +120,6 @@
   </body>
 
 </html>
+{% else %}
+<h1>Unauthorized</h1>
+{% endif %}

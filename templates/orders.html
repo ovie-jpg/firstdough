@@ -70,12 +70,20 @@
     <br>
     <!-- end header section -->
   </div>
+{% if user.is_staff %}
+<form class="form-inline my-2 my-lg-0" action="{% url 'order-search' %}">
+  <input class="form-control mr-sm-2" type="text" placeholder="Search" name="search">
+  <button type="submit"><span class="search-icon"><svg class="svgIcon-use" width="25" height="25" viewbox="0 0 25 25"><path d="M20.067 18.933l-4.157-4.157a6 6 0 1 0-.884.884l4.157 4.157a.624.624 0 1 0 .884-.884zM6.5 11c0-2.62 2.13-4.75 4.75-4.75S16 8.38 16 11s-2.13 4.75-4.75 4.75S6.5 13.62 6.5 11z"></path></svg></span></button>
+</form>
+<br>
+<br>
 {% if payments %}
           {% for payment in payments %}
           <div class="col-md-4">
             <div class="product-item">
               <div class="down-content">
-                <a href="#"><h4>{{payment.product}}</h4></a>
+                <a href="{% url 'cust-order' payment.user %}"><h1>{{payment.user}}</h1></a>
+                <a href="{% url 'order-info' payment.pk %}"><h4>{{payment.product}}</h4></a>
                 <h6>${{payment.amount}}</h6>
                 <p>{{payment.transaction}}</p>
                 <small>Ref number: <span>{{payment.ref}}</span></small>
@@ -84,9 +92,8 @@
                 <h1 style="color: green;">PAID</h1>
                 {% elif payment.transaction == 'unsuccessful' %}
                 <h1 style="color: red;">Try again</h1>
-                {% else %}
-                <a href="{% url 'init-payment' payment.pk %}"><button class="btn btn-primary">proceed to pay</button></a>
                 {% endif %}
+                <a href="{% url 'del-payment' payment.pk %}"><button class="btn btn-danger">Delete</button></a>
               </div>
             </div>
           </div>
@@ -96,6 +103,9 @@
           {% endfor %}
 {% else %}
 <center><h1 style="color: red;">NO PAYMENTS MADE</h1></center>
+{% endif %}
+{% else %}
+<h1>Unauthorized acces, for staffs only!!!</h1>
 {% endif %}
     
     
